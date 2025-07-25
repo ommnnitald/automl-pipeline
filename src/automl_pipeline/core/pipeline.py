@@ -124,6 +124,7 @@ class AutoMLPipeline:
                     median_val = X_processed[col].median()
                     X_processed[col] = X_processed[col].fillna(median_val)
                     preprocessors[f'median_{col}'] = median_val
+                    print(f"   Filled {col} missing values with median: {median_val}")
 
             # For categorical columns: fill with mode
             categorical_cols = X_processed.select_dtypes(include=['object']).columns
@@ -132,6 +133,11 @@ class AutoMLPipeline:
                     mode_val = X_processed[col].mode()[0] if len(X_processed[col].mode()) > 0 else 'unknown'
                     X_processed[col] = X_processed[col].fillna(mode_val)
                     preprocessors[f'mode_{col}'] = mode_val
+                    print(f"   Filled {col} missing values with mode: {mode_val}")
+
+        # Verify no missing values remain
+        remaining_missing = X_processed.isnull().sum().sum()
+        print(f"   Missing values after preprocessing: {remaining_missing}")
 
         # Handle categorical variables
         categorical_cols = X_processed.select_dtypes(include=['object']).columns
@@ -148,7 +154,16 @@ class AutoMLPipeline:
             index=X_processed.index
         )
         preprocessors['scaler'] = scaler
-        
+
+        # Final check for any remaining NaN values
+        final_missing = X_processed.isnull().sum().sum()
+        if final_missing > 0:
+            print(f"   WARNING: {final_missing} NaN values still remain!")
+            # Force fill any remaining NaN with 0
+            X_processed = X_processed.fillna(0)
+            print(f"   Filled remaining NaN values with 0")
+
+        print(f"   ✅ Preprocessing complete. Final shape: {X_processed.shape}")
         return X_processed, preprocessors
     
     def _train_models(self, X_train, X_test, y_train, y_test, problem_type):
