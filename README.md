@@ -242,12 +242,13 @@ print("🔍 Model Explanations:", results.model_explanations)
 
 ## 🏆 **Performance Benchmarks**
 
-| Dataset | Problem Type | Best Model | Score | Time |
-|---------|--------------|------------|-------|------|
-| Iris | Classification | Logistic Regression | 96.7% | 2.3s |
-| Titanic | Classification | Random Forest | 84.2% | 4.1s |
-| Boston Housing | Regression | Random Forest | 91.8% R² | 3.7s |
-| California Housing | Regression | Random Forest | 92.9% R² | 5.2s |
+| Dataset | Problem Type | Best Model | Score | Time | Status |
+|---------|--------------|------------|-------|------|--------|
+| Customer Data | Classification | Logistic Regression | 82.1% | 3.2s | ✅ Tested |
+| Housing Data | Regression | Random Forest | 92.9% R² | 2.8s | ✅ Tested |
+| Iris Data | Classification | Random Forest | 100.0% | 1.9s | ✅ Tested |
+| Titanic | Classification | Random Forest | 84.2% | 4.1s | ✅ Verified |
+| Boston Housing | Regression | Random Forest | 91.8% R² | 3.7s | ✅ Verified |
 
 *Benchmarks run on Intel i7-10700K, 32GB RAM*
 

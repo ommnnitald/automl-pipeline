@@ -110,17 +110,36 @@ class AutoMLPipeline:
     def _preprocess_data(self, X):
         """Preprocess the data"""
         print("⚙️ Preprocessing data...")
-        
+
         preprocessors = {}
         X_processed = X.copy()
-        
+
+        # Handle missing values first
+        print(f"   Missing values found: {X_processed.isnull().sum().sum()}")
+        if X_processed.isnull().sum().sum() > 0:
+            # For numerical columns: fill with median
+            numerical_cols = X_processed.select_dtypes(include=['int64', 'float64']).columns
+            for col in numerical_cols:
+                if X_processed[col].isnull().sum() > 0:
+                    median_val = X_processed[col].median()
+                    X_processed[col] = X_processed[col].fillna(median_val)
+                    preprocessors[f'median_{col}'] = median_val
+
+            # For categorical columns: fill with mode
+            categorical_cols = X_processed.select_dtypes(include=['object']).columns
+            for col in categorical_cols:
+                if X_processed[col].isnull().sum() > 0:
+                    mode_val = X_processed[col].mode()[0] if len(X_processed[col].mode()) > 0 else 'unknown'
+                    X_processed[col] = X_processed[col].fillna(mode_val)
+                    preprocessors[f'mode_{col}'] = mode_val
+
         # Handle categorical variables
         categorical_cols = X_processed.select_dtypes(include=['object']).columns
         for col in categorical_cols:
             le = LabelEncoder()
             X_processed[col] = le.fit_transform(X_processed[col].astype(str))
             preprocessors[f'label_encoder_{col}'] = le
-        
+
         # Scale numerical features
         scaler = StandardScaler()
         X_processed = pd.DataFrame(
